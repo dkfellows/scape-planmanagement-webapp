@@ -11,6 +11,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Deployment configuration -->
+        <deploy.name>plans</deploy.name>
+        <deploy.type>glassfish4x</deploy.type>
+        <deploy.config>server-id-in-settings.xml</deploy.config>
     </properties>
 
     <dependencies>
@@ -71,6 +75,42 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
+            </plugin>
+            <plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.0.6</version>
+				<executions>
+					<execution>
+						<id>deploy-to-target-host</id>
+						<goals><goal>redeploy</goal></goals>
+						<phase>install</phase>
+						<configuration>
+							<container>
+								<containerId>${deploy.type}</containerId>
+								<type>remote</type>
+							</container>
+							<configuration>
+								<type>runtime</type>
+								<properties>
+									<cargo.server.settings>${deploy.config}</cargo.server.settings>
+								</properties>
+							</configuration>
+							<deployer>
+								<deployables>
+									<deployable>
+										<groupId>${project.groupId}</groupId>
+										<artifactId>${project.artifactId}</artifactId>
+										<type>war</type>
+										<properties>
+											<context>${deploy.name}</context>
+										</properties>
+									</deployable>
+								</deployables>
+							</deployer>
+						</configuration>
+					</execution>
+				</executions>
             </plugin>
         </plugins>
         <pluginManagement>
